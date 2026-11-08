@@ -45,7 +45,7 @@ The code is in 1 Jupyter notebook (`jk_SAS_to_PySpark_migration_0036.ipynb`).
 
 1. Install Java 17 or 21 (Spark needs a JVM, and PySpark 4.3.0 is built for Java 17). The Spark 3.5.3 docs list only Java 8/11/17, while the 13 tests passed on Java 21 with PySpark 3.5.3 and with 4.3.0. On Java 25, PySpark 3.5.3 stopped before its 1st test with "getSubject is not supported", while 4.3.0 passed the 13 tests.
 
-2. On Python 3.14.6, PySpark 3.5.3 stopped before its 1st test with a `PicklingError`, while 4.3.0 passed the 13 tests. On Python 3.13 or earlier, install the Python packages (the 13 tests pass on PySpark 3.5.3 and on 4.3.0):
+2. On Python 3.14.6, PySpark 3.5.3 stopped before its 1st test with a `PicklingError`, while 4.3.0 passed the 13 tests. On Python 3.8 to 3.13, install the Python packages (on Python 3.13, the 13 tests passed with PySpark 3.5.3 and with 4.3.0):
 
    ```
    pip install "pyspark==3.5.3" "pandas<3" numpy pytest setuptools notebook
@@ -58,6 +58,14 @@ The code is in 1 Jupyter notebook (`jk_SAS_to_PySpark_migration_0036.ipynb`).
      - 2 `distutils` deprecations from PySpark's own `pyspark/sql/pandas/utils.py`.
      - 12 `ResourceWarning` warnings for unclosed sockets (in a local run).
    - `notebook` installs Jupyter into the same environment so that its kernel sees these packages.
+
+   On Python 3.14, install PySpark 4.3.0 instead (on Python 3.14.6, the 13 tests passed with PySpark 4.3.0, pandas 3.1.1, pyarrow 26.0.1):
+
+   ```
+   pip install "pyspark==4.3.0" "pandas==3.1.1" "pyarrow==26.0.1" numpy pytest notebook
+   ```
+
+   - With pandas 3.1.1, PySpark 4.3.0 prints a `FutureWarning` ("PySpark does not yet fully support pandas >= 3.0.0.") and, in the tests, 6 `Pandas4Warning` warnings.
    - Step-1 and step-2 are not needed in Google Colab:
      - Colab's published apt list has Java 21 (`openjdk-21-jdk-headless`) installed.
      - Colab's published package list gives PySpark 4.0.5 and pandas 2.2.3, and the 13 tests passed on a local copy of those versions.
