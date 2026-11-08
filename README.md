@@ -43,7 +43,7 @@ The notebook is for analysts and data engineers who are moving SAS code to Apach
 
 The code is in 1 Jupyter notebook (`jk_SAS_to_PySpark_migration_0036.ipynb`).
 
-1. Install Java (Spark needs a JVM).
+1. Install Java 17 or 21 (Spark needs a JVM, and PySpark 4.3.0 is built for Java 17). The 13 tests passed on Java 21 with PySpark 3.5.3 and with 4.3.0. On Java 25, PySpark 3.5.3 stopped before its 1st test with "getSubject is not supported", while 4.3.0 passed the 13 tests.
 
 2. Install the Python packages (the 13 tests pass on PySpark 3.5.3 and on 4.3.0):
 
@@ -56,7 +56,7 @@ The code is in 1 Jupyter notebook (`jk_SAS_to_PySpark_migration_0036.ipynb`).
    - With pandas 2 on PySpark 3.5.3, all 13 tests pass when cell-5 runs them, but the run still prints 3 kinds of warning:
      - The `is_datetime64tz_dtype` deprecation (ROADMAP.md has the details).
      - 2 `distutils` deprecations from PySpark's own `pyspark/sql/pandas/utils.py`.
-     - `ResourceWarning` lines for unclosed sockets (12 in a local run).
+     - 12 `ResourceWarning` warnings for unclosed sockets (in a local run).
    - `notebook` installs Jupyter into the same environment so that its kernel sees these packages.
    - Step-1 and step-2 are not needed in Google Colab:
      - Colab's published apt list has Java 21 (`openjdk-21-jdk-headless`) installed.
