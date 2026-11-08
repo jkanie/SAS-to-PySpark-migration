@@ -43,7 +43,7 @@ The notebook is for analysts and data engineers who are moving SAS code to Apach
 
 The code is in 1 Jupyter notebook (`jk_SAS_to_PySpark_migration_0036.ipynb`).
 
-1. Install Java 17 or 21 (Spark needs a JVM, and PySpark 4.3.0 is built for Java 17). The 13 tests passed on Java 21 with PySpark 3.5.3 and with 4.3.0. On Java 25, PySpark 3.5.3 stopped before its 1st test with "getSubject is not supported", while 4.3.0 passed the 13 tests.
+1. Install Java 17 or 21 (Spark needs a JVM, and PySpark 4.3.0 is built for Java 17). The Spark 3.5.3 docs list only Java 8/11/17, while the 13 tests passed on Java 21 with PySpark 3.5.3 and with 4.3.0. On Java 25, PySpark 3.5.3 stopped before its 1st test with "getSubject is not supported", while 4.3.0 passed the 13 tests.
 
 2. Install the Python packages (the 13 tests pass on PySpark 3.5.3 and on 4.3.0):
 
