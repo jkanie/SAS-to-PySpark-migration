@@ -1,8 +1,8 @@
 # SAS-to-PySpark-migration
 
-This is a Jupyter notebook with a Python class (`SASPySparkMigration`) that maps the SAS procedures and DATA-step patterns in the table below (all but `PROC ARIMA`, whose method is a place-holder) to PySpark DataFrame operations.
+This repository holds a Jupyter notebook with a Python class (`SASPySparkMigration`) that maps the SAS procedures and DATA-step patterns in the table below (all but `PROC ARIMA`, whose method is a place-holder) to PySpark DataFrame operations.
 
-Each public method of the `SASPySparkMigration` class has a docstring that names the SAS procedure or DATA-step pattern that the method replaces. Every docstring except `summarize_dataset`'s shows the SAS code. A SAS program that uses only the procedures and DATA-step patterns in the table below (except `PROC ARIMA`) and only the options that each docstring shows can therefore be mapped procedure by procedure once the docstring fixes in ROADMAP.md bring each docstring's SAS code in line with its method and with SAS. ROADMAP.md also lists where the methods' results still differ from SAS.
+Each public method of the `SASPySparkMigration` class has a docstring that names the SAS procedure or DATA-step pattern that the method replaces. Every docstring except `summarize_dataset`'s shows the SAS code. A SAS program that uses only the procedures and DATA-step patterns in the table below (except `PROC ARIMA`) and only the options that each docstring shows can therefore be mapped procedure by procedure once the fixes to the docstrings in ROADMAP.md bring each docstring's SAS code in line with its method and with SAS. ROADMAP.md also lists where the methods' results still differ from SAS.
 
 Once the fixes in ROADMAP.md bring each method in line with SAS's defaults, the class can also serve as a reference for checking code produced by SAS-to-PySpark converters.
 
@@ -45,7 +45,7 @@ The code is in 1 Jupyter notebook (`jk_SAS_to_PySpark_migration_0036.ipynb`).
 
 1. Install Java 17 or 21 (Spark needs a JVM, and PySpark 4.3.0 is built for Java 17). The Spark 3.5.3 docs list only Java 8/11/17, while the 13 tests passed on Java 21 with PySpark 3.5.3 and with 4.3.0. On Java 25, PySpark 3.5.3 stopped before its 1st test with "getSubject is not supported", while 4.3.0 passed the 13 tests.
 
-2. Install the Python packages (the 13 tests pass on PySpark 3.5.3 and on 4.3.0):
+2. On Python 3.14.6, PySpark 3.5.3 stopped before its 1st test with a `PicklingError`, while 4.3.0 passed the 13 tests. On Python 3.13 or earlier, install the Python packages (the 13 tests pass on PySpark 3.5.3 and on 4.3.0):
 
    ```
    pip install "pyspark==3.5.3" "pandas<3" numpy pytest setuptools notebook
