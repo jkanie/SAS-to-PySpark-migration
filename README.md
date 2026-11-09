@@ -53,23 +53,24 @@ The code is in 1 Jupyter notebook (`jk_SAS_to_PySpark_migration_0036.ipynb`).
 
    - `setuptools` is needed on Python 3.12 and later because `pyspark.ml` and PySpark's pandas conversion in 3.5.x import `distutils`.
    - pandas stays below 3 because, in the notebook's tests, pandas 3 makes PySpark 3.5.3 print `Pandas4Warning` warnings ("The copy keyword is deprecated") that pandas 2 does not.
-   - With pandas 2 on PySpark 3.5.3, all 13 tests pass when cell-5 runs them, but the run still prints 3 kinds of warning:
+   - With pandas 2.3.3 (which `pandas<3` gives on Python 3.9 to 3.13) on PySpark 3.5.3, all 13 tests pass when cell-5 runs them, but the run still prints 3 kinds of warning:
      - The `is_datetime64tz_dtype` deprecation (ROADMAP.md has the details).
      - 2 `distutils` deprecations from PySpark's own `pyspark/sql/pandas/utils.py`.
      - 12 `ResourceWarning` warnings for unclosed sockets (in a local run).
+   - On Python 3.8, `pandas<3` gives pandas 2.0.3, and the run printed only the 2nd and 3rd kinds.
    - `notebook` installs Jupyter into the same environment so that its kernel sees these packages.
-
-   On Python 3.14, install PySpark 4.3.0 instead (on Python 3.14.6, the 13 tests passed with PySpark 4.3.0, pandas 3.1.1, pyarrow 26.0.1):
-
-   ```
-   pip install "pyspark==4.3.0" "pandas==3.1.1" "pyarrow==26.0.1" numpy pytest notebook
-   ```
-
-   - With pandas 3.1.1, PySpark 4.3.0 prints a `FutureWarning` ("PySpark does not yet fully support pandas >= 3.0.0.") and, in the tests, 6 `Pandas4Warning` warnings.
    - Step-1 and step-2 are not needed in Google Colab:
      - Colab's published apt list has Java 21 (`openjdk-21-jdk-headless`) installed.
      - Colab's published package list gives PySpark 4.0.5 and pandas 2.2.3, and the 13 tests passed on a local copy of those versions.
      - Cell-1's own `!pip install` line adds any package that is missing.
+
+   On Python 3.14, install PySpark 4.3.0 instead (on Python 3.14.6, the 13 tests passed with PySpark 4.3.0, pyarrow 26.0.1, pandas 2.3.3 from `pandas<3`):
+
+   ```
+   pip install "pyspark==4.3.0" "pandas<3" "pyarrow==26.0.1" numpy pytest notebook
+   ```
+
+   - pandas stays below 3 here too. With pandas 3.1.1, the same run printed 4 `FutureWarning` warnings ("PySpark does not yet fully support pandas >= 3.0.0.") and 6 `Pandas4Warning` warnings, while pandas 2.3.3 gave none of either.
 
 3. Open the notebook in Jupyter or Google Colab.
 
