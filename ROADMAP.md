@@ -4,8 +4,6 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
 
 ## Fixes
 
-- Worked example-14 of `conditional_column_creation` produces `'Adult'` and `'Senior'` (quotes included) because its values carry inner quotes and `when` stores each value as a literal. In PySpark 3.5.3 and 4.3.0 runs, wrapping each value in `F.lit` gave the same output as the method for strings, numbers, booleans, a date, None. The method itself therefore needs no change. Example-14 should drop its inner quotes (`"Senior"` in place of `"'Senior'"`) so that the result holds the value without its quotes. The method's docstring should say that each value is a literal (not a SQL expression) so that a caller does not add the quotes that SQL needs. Parsing string values with `F.expr` instead would break plain strings. In PySpark 3.5.3 and 4.3.0 runs, `F.expr` on `X`, `Male`, `High risk` stopped with `UNRESOLVED_COLUMN.WITH_SUGGESTION`. On `O'Brien`, it stopped with `PARSE_SYNTAX_ERROR`. On `age`, it returned the age column's values. `F.expr` also stopped on the values 5, True, a date, None.
-
 - `standardize_data` fails on a constant column because the standard deviation (or the range) is 0. In a PySpark 3.5.3 run, the method returned `NULL` for every row. On 4.3.0, it stopped with `DIVIDE_BY_ZERO`. On a 1-row column, the standard deviation is NULL rather than 0, and the default `zscore` returned NULL on both versions without an error. SAS's PROC STDIZE says "Constant variables are not standardized.". The method should therefore keep a constant column's values as they are. Its constant-column check should catch a NULL standard deviation too so that a 1-row column keeps its value.
 
 - `sql_query` and `univariate_analysis` use the notebook's global `spark` session. They should use the DataFrame's own session (`self.df.sparkSession`) so that the class works outside the notebook.
@@ -105,7 +103,7 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
   - The `split_dataset` SAS code also has no `SEED=`. Without `SEED=`, PROC SURVEYSELECT "uses the time of day from the computer’s clock to obtain the initial seed.". Each run of that SAS code therefore draws a new sample, while the method's seed of 42 gives the same sample each time that the same DataFrame (with the same partitions) is split. SAS re-produces a sample from "this same seed value in the SEED= option, along with the same sample selection parameters.". The SAS code should show `SEED=42`.
   - The `rolling_window_analysis` SAS code leaves out `METHOD=`. PROC EXPAND would therefore fill embedded missing values with its default `METHOD=SPLINE`, while the method does not interpolate them (a 2-row moving average over 1.0, null, 2.0 gave 1.0, 1.0, 2.0 in a PySpark 3.5.3 run). The SAS code should show `METHOD=NONE`.
   - The `summarize_dataset` docstring names only PROC CONTENTS (which "Prints descriptions of the contents of one or more SAS library files"), while the method also prints 5 data rows and value-counts. The docstring should name PROC PRINT and PROC FREQ for those parts.
-  - The `conditional_column_creation` SAS code assigns character values with no `LENGTH` statement. For a variable made from a character literal, SAS takes the "Length of first literal encountered". With the values of worked example-14, SAS therefore stores `Minor`, `Adult`, `Senio`, where the method (once the example-14 change is in) gives `Senior`. The SAS code should start with a `LENGTH` statement that sets the variable's length to that of the longest value.
+  - The `conditional_column_creation` SAS code assigns character values with no `LENGTH` statement. For a variable made from a character literal, SAS takes the "Length of first literal encountered". With the values of worked example-14, SAS therefore stores `Minor`, `Adult`, `Senio`, where the method gives `Senior`. The SAS code should start with a `LENGTH` statement that sets the variable's length to that of the longest value.
   - The `sort_data` SAS code has no `OUT=`. "Without the OUT= option, PROC SORT replaces the original data set with the sorted observations", while the method returns a new DataFrame. The SAS code should show `OUT=`.
   - The `handle_missing` SAS code has no `OUT=` either: "If you omit the OUT= option, PROC STDIZE creates an output data set named according to the DATAn convention.". The method instead returns a new DataFrame that its caller names. The SAS code should show `OUT=`.
   - The `handle_missing` SAS code shows only `METHOD=MEAN`, while the method also takes `median` and `mode` (PROC STDIZE has no `mode`, as the method-names item under `handle_missing` says). The SAS code should show `METHOD=MEDIAN` beside `METHOD=MEAN`, and the docstring should say that `mode` has no PROC STDIZE match so that a user does not look for one.
@@ -418,10 +416,9 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
 
 - The notebook's 1st cell starts with a comment line, then `%%capture`. A cell magic must be the 1st line of a cell. In IPython 9.18.1, the cell stopped with "``UsageError: Line magic function `%%capture` not found.``". The install, the imports, the Spark session therefore never ran. `%%capture` should move to line-1.
 
-- 3 worked examples change with the fixes. Each should be re-written with its fix:
+- 2 worked examples change with the fixes. Each should be re-written with its fix:
   - 9, for the `temp_table` view and `ROUND`.
   - 13, for the order-by column.
-  - 14, which drops its inner quotes (`"Senior"` in place of `"'Senior'"`).
 
   Example-17 goes with `time_series_forecasting`.
 
@@ -456,7 +453,7 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
   - `split_dataset`.
   - `time_series_forecasting`.
 
-  Each of these 5 methods that stays should get a test that checks a value worked out by hand from the SAS rule that it follows so that a fault (such as the quote characters of example-14) fails a test.
+  Each of these 5 methods that stays should get a test that checks a value worked out by hand from the SAS rule that it follows so that a fault (such as the quote characters that example-14 printed until its fix) fails a test.
 
 - Pin and test the supported versions of PySpark, Python, Java, pandas:
   - The suite passes on PySpark 3.5.3, where Python 3.12 or later needs `setuptools` because `pyspark.ml` and PySpark's pandas conversion import `distutils`. On PySpark 4.3.0 with Python 3.13 and pandas 3.1.1, the 13 tests pass and the worked examples run without `setuptools`. The pins should therefore add `setuptools` for PySpark 3.5.3 on Python 3.12 or later.
