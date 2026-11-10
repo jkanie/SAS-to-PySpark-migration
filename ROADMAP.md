@@ -411,8 +411,6 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
 
 ## Packaging
 
-- The notebook's 1st cell starts with a comment line, then `%%capture`. A cell magic must be the 1st line of a cell. In IPython 9.18.1, the cell stopped with "``UsageError: Line magic function `%%capture` not found.``". The install, the imports, the Spark session therefore never ran. `%%capture` should move to line-1.
-
 - 2 worked examples change with the fixes. Each should be re-written with its fix:
   - 9, for the `temp_table` view and `ROUND`.
   - 13, for the order-by column.

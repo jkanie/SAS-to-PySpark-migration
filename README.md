@@ -74,9 +74,7 @@ The code is in 1 Jupyter notebook (`jk_SAS_to_PySpark_migration_0036.ipynb`).
 
 3. Open the notebook in Jupyter or Google Colab.
 
-4. In cell-1, move the line `%%capture` above the comment line since a cell magic must be the 1st line of its cell.
-
-5. Run all cells.
+4. Run all cells.
 
 The 5th cell runs the 14 unit tests. The 6th cell prints the 17 worked examples, then runs the tests again.
 
