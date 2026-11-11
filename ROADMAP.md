@@ -4,8 +4,6 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
 
 ## Fixes
 
-- `sql_query` and `univariate_analysis` use the notebook's global `spark` session. They should use the DataFrame's own session (`self.df.sparkSession`) so that the class works outside the notebook.
-
 - `rolling_window_analysis`:
   - `rolling_window_analysis` builds its window with `Window.orderBy()` and no column. The row order behind each moving average is therefore not defined. The method needs an order-by column parameter (like `ID` in `PROC EXPAND`). Because the row order is not defined, the method should sort by that column, while PROC EXPAND only checks the order that it reads: "PROC EXPAND verifies that the ID values are nonmissing and in ascending order.". On input already in ID order, the method and PROC EXPAND give the same rows. A repeated value in the order-by column also leaves the order of the tied rows undefined (in PySpark 3.5.3 and 4.3.0 runs, 2 input orders of the same 3 rows gave 25.0 and 20.0 at the last row). The SAS/ETS guide's PROC EXPAND chapter says that "there should be no duplicate observations". The method should raise an error for a repeated order-by value.
   - In a PySpark 3.5.3 run ordered by a column with a null, the null row sorted 1st, then entered the average. PROC EXPAND checks that each ID value is non-missing (the check quoted above): "An error message is produced and the observation is ignored when an invalid ID value is found in the input data set.". The method should therefore drop such rows and log an error message for each.
@@ -517,7 +515,7 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
 
 ## Documentation and sample data
 
-- Replace the invented health-themed sample data with an invented retail-sales data-set so that the examples show a general-purpose tool. The 13 tests and 14 of the worked examples (all but example-15 and example-16, with example-17 removed by the `time_series_forecasting` item) read the current data's columns by name (among them `diagnosis`, `care_level`, `length_of_stay`, `temperature`, `blood_pressure`). Each of those tests and examples changes with the new data-set.
+- Replace the invented health-themed sample data with an invented retail-sales data-set so that the examples show a general-purpose tool. The 15 tests and 14 of the worked examples (all but example-15 and example-16, with example-17 removed by the `time_series_forecasting` item) read the current data's columns by name (among them `diagnosis`, `care_level`, `length_of_stay`, `temperature`, `blood_pressure`). Each of those tests and examples changes with the new data-set.
 
   The new data-set should hold its dates in a date column, not as text (as `admission_date` holds them today). The dates and time-stamps item and the `INTNX` and `INTCK` item above need real dates so that their tests can run on the sample data.
 
