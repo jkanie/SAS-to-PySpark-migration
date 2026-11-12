@@ -8,11 +8,10 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
   - `rolling_window_analysis` builds its window with `Window.orderBy()` and no column. The row order behind each moving average is therefore not defined. The method needs an order-by column parameter (like `ID` in `PROC EXPAND`). Because the row order is not defined, the method should sort by that column, while PROC EXPAND only checks the order that it reads: "PROC EXPAND verifies that the ID values are nonmissing and in ascending order.". On input already in ID order, the method and PROC EXPAND give the same rows. A repeated value in the order-by column also leaves the order of the tied rows undefined (in PySpark 3.5.3 and 4.3.0 runs, 2 input orders of the same 3 rows gave 25.0 and 20.0 at the last row). The SAS/ETS guide's PROC EXPAND chapter says that "there should be no duplicate observations". The method should raise an error for a repeated order-by value.
   - In a PySpark 3.5.3 run ordered by a column with a null, the null row sorted 1st, then entered the average. PROC EXPAND checks that each ID value is non-missing (the check quoted above): "An error message is produced and the observation is ignored when an invalid ID value is found in the input data set.". The method should therefore drop such rows and log an error message for each.
 
-- `frequency_analysis`, `calculate_means`, `cross_tabulation`, `rank_data`, `correlation_analysis` do not follow SAS's defaults for missing values. Each should follow the SAS default:
+- `frequency_analysis`, `calculate_means`, `cross_tabulation`, `correlation_analysis` do not follow SAS's defaults for missing values. Each should follow the SAS default:
   - PROC FREQ leaves a missing value out of its table and out of the percentages ("Also by default, PROC FREQ does not include observations with missing values in the computation of percentages and statistics."), while its `OUT=` data-set keeps 1 row with the missing frequency ("The TABLES statement OUT= data set includes an observation that contains the missing value frequency."). Today, `frequency_analysis` gives the null row a percentage and counts it in the total (on a, a, null, b, it gave level-a 50.0, where SAS gives 66.67). The method should keep the null row's count and give it no percentage. The method should take the percentages over the non-missing rows.
   - PROC MEANS drops a row whose `CLASS` value is missing. Today, `calculate_means` keeps a null group.
   - PROC TABULATE also drops a row whose `CLASS` value is missing. Today, `cross_tabulation` adds a `null` row plus a `null` column.
-  - PROC RANK leaves a missing value unranked. Today, `rank_data` ranks a null 1st.
   - PROC CORR uses pairwise deletion. Today, `correlation_analysis` drops every row that has a null in any of the columns.
 
   `frequency_analysis`, `calculate_means`, `cross_tabulation` also need an option for SAS's `MISSING` rule so that the methods can count a missing value as a level for code that uses `MISSING`.
@@ -319,7 +318,6 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
 - 9 methods handle a bad argument without a clear error. Each result below came from a PySpark 3.5.3 run:
   - `standardize_data` returned the data unchanged for `method='std'` and `method='range'` (the names that its own docstring shows as `METHOD=STD` and `METHOD=RANGE`). The method should take `STD` as an alias of `zscore` and `RANGE` as an alias of `minmax`. It should raise an error on any other value.
   - `rolling_window_analysis` filled the new column with nulls for a window size of 0 or -2. It should raise an error for a size below 1.
-  - `rank_data` stopped with a bare `KeyError: 'mean'` for an unknown method. The method should raise an error that names the bad value and lists the methods that it takes.
   - `rolling_window_analysis` names the bad value but does not list its methods. Its error should list them too.
   - A single name where a list is expected stopped 7 methods:
     - `sort_data("age")` read the string letter by letter and stopped on a column `a`.
@@ -509,7 +507,7 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
 
 ## Documentation and sample data
 
-- Replace the invented health-themed sample data with an invented retail-sales data-set so that the examples show a general-purpose tool. The 16 tests and 14 of the worked examples (all but example-15 and example-16, with example-17 removed by the `time_series_forecasting` item) read the current data's columns by name (among them `diagnosis`, `care_level`, `length_of_stay`, `temperature`, `blood_pressure`). Each of those tests and examples changes with the new data-set.
+- Replace the invented health-themed sample data with an invented retail-sales data-set so that the examples show a general-purpose tool. The 17 tests and 14 of the worked examples (all but example-15 and example-16, with example-17 removed by the `time_series_forecasting` item) read the current data's columns by name (among them `diagnosis`, `care_level`, `length_of_stay`, `temperature`, `blood_pressure`). Each of those tests and examples changes with the new data-set.
 
   The new data-set should hold its dates in a date column, not as text (as `admission_date` holds them today). The dates and time-stamps item and the `INTNX` and `INTCK` item above need real dates so that their tests can run on the sample data.
 
