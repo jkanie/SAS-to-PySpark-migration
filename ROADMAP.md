@@ -298,7 +298,7 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
   - The method-name is case-sensitive -- `method='PEARSON'` (the spelling of its own docstring) stopped with "Unrecognized method name". SAS says "You can use uppercase, lowercase, or mixed case in the code that you write.". The method should lower-case the name that it is given.
   - On a constant column, the method gave NaN for that column's coefficient with each other column (its diagonal entry stayed 1.0). On 1 row, it stopped with "computeCovariance called on matrix with only 1 rows". None of the SAS pages that were searched gives PROC CORR's result for either case. The method should return NULL in both cases (for the constant column because SAS has no NaN and for 1 row so that the call does not stop).
 
-- `standardize_data`, `rank_data`, `handle_missing`, `rolling_window_analysis` take case-sensitive method-names too (as the case-sensitivity item under `correlation_analysis` says of that method). `rolling_window_analysis("age", 2, "MEAN")` stopped with "Unsupported aggregation function: MEAN". Each should lower-case the name that it is given.
+- `standardize_data`, `rank_data`, `handle_missing`, `rolling_window_analysis` take case-sensitive method-names too (as the case-sensitivity item under `correlation_analysis` says of that method). `rolling_window_analysis("age", 2, "MEAN")` stops with "agg_func must be 1 of mean, sum, min, max, got 'MEAN'". Each should lower-case the name that it is given.
 
 - 5 methods do not follow SAS's rule for an omitted `VAR` or `TABLES` statement when they get an empty column list. Each result below came from PySpark 3.5.3 and 4.3.0 runs:
   - `calculate_means` stopped with "exprs should not be empty".
@@ -315,10 +315,8 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
 
   Each method should read an empty list as SAS's default or raise an error that names the problem so that no call stops on an internal error or returns the data unchanged.
 
-- 9 methods handle a bad argument without a clear error. Each result below came from a PySpark 3.5.3 run:
+- 8 methods handle a bad argument without a clear error. Each result below came from a PySpark 3.5.3 run:
   - `standardize_data` returned the data unchanged for `method='std'` and `method='range'` (the names that its own docstring shows as `METHOD=STD` and `METHOD=RANGE`). The method should take `STD` as an alias of `zscore` and `RANGE` as an alias of `minmax`. It should raise an error on any other value.
-  - `rolling_window_analysis` filled the new column with nulls for a window size of 0 or -2. It should raise an error for a size below 1.
-  - `rolling_window_analysis` names the bad value but does not list its methods. Its error should list them too.
   - A single name where a list is expected stopped 7 methods:
     - `sort_data("age")` read the string letter by letter and stopped on a column `a`.
     - `rank_data(partition_cols="gender")` also read the string letter by letter (stopping on a column `g`).
@@ -328,7 +326,6 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
     Each should take a single name, as PySpark's own `sort` and `groupBy` do.
   - `sort_data(ascending=0)` stopped with "'int' object is not iterable". `sort_data` should take a 0 or 1, as PySpark's own `sort` does for `ascending`.
   - `merge_datasets` with an empty `on` list stopped with a bare `IndexError`. SAS says "To perform a one-to-one merge, use the MERGE statement without a BY statement.". The method should either raise an error that names the problem or merge by position.
-  - `rolling_window_analysis` stopped with a `Py4JError` for a window size of 2.0 and with `INVALID_BOUNDARY` for 3,000,000,000. It should take an integer of 1 or more and raise a clear error when the window's start falls outside the range that Spark accepts ("[-2147483648, 2147483647]" in its `INVALID_BOUNDARY` message).
 
 - The hint of `conditional_column_creation` says `Dict[str, str]`, while numbers, dates, booleans, None work as values. It should be `dict[str, Any]` (the built-in form that the `ruff` item below asks for, with the `from __future__ import annotations` line that the same item needs on Python 3.8 and 3.9), with `Any` added to the notebook's `from typing import` line. Without the `Any` import (and without the `__future__` line), the class definition stops with `NameError` on Python 3.13 and earlier because those versions evaluate the hint when they define the method. Python 3.14 (which the PyPI classifiers of PySpark 4.3.0 list) defers the hint. On Python 3.14.6, the class definition therefore ran, and the `NameError` came only when the hint was read (through `__annotations__`).
 
@@ -507,7 +504,7 @@ Each "PySpark 3.5.3 run" below used PySpark 3.5.3 with pandas 3.1.1 on Python 3.
 
 ## Documentation and sample data
 
-- Replace the invented health-themed sample data with an invented retail-sales data-set so that the examples show a general-purpose tool. The 17 tests and 14 of the worked examples (all but example-15 and example-16, with example-17 removed by the `time_series_forecasting` item) read the current data's columns by name (among them `diagnosis`, `care_level`, `length_of_stay`, `temperature`, `blood_pressure`). Each of those tests and examples changes with the new data-set.
+- Replace the invented health-themed sample data with an invented retail-sales data-set so that the examples show a general-purpose tool. 15 of the 18 tests and 14 of the worked examples (all but example-15 and example-16, with example-17 removed by the `time_series_forecasting` item) read the current data's columns by name (among them `diagnosis`, `care_level`, `length_of_stay`, `temperature`, `blood_pressure`). Each of those tests and examples changes with the new data-set.
 
   The new data-set should hold its dates in a date column, not as text (as `admission_date` holds them today). The dates and time-stamps item and the `INTNX` and `INTCK` item above need real dates so that their tests can run on the sample data.
 
