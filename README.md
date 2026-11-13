@@ -76,7 +76,7 @@ The code is in 1 Jupyter notebook (`jk_SAS_to_PySpark_migration_0036.ipynb`).
 
 4. Run all cells.
 
-The 5th cell runs the 19 unit tests. The 6th cell prints the 17 worked examples, then runs the tests again.
+The 5th cell runs the 20 unit tests. The 6th cell prints the 17 worked examples, then runs the tests again.
 
 The sample data in the notebook is invented for testing and holds no real person's data.
 
