@@ -521,7 +521,7 @@ The total is about 57 hours.
 
 2 items, about 3 hours.
 
-- Replace the invented health-themed sample data with an invented retail-sales data-set so that the examples show a general-purpose tool. 17 of the 21 tests and 14 of the worked examples (all but example-15 and example-16, with example-17 removed by the `time_series_forecasting` item) read the current data's columns by name (among them `diagnosis`, `care_level`, `length_of_stay`, `temperature`, `blood_pressure`). Each of those tests and examples changes with the new data-set.
+- Replace the invented health-themed sample data with an invented retail-sales data-set so that the examples show a general-purpose tool. 18 of the 22 tests and 14 of the worked examples (all but example-15 and example-16, with example-17 removed by the `time_series_forecasting` item) read the current data's columns by name (among them `diagnosis`, `care_level`, `length_of_stay`, `temperature`, `blood_pressure`). Each of those tests and examples changes with the new data-set.
 
   The new data-set should hold its dates in a date column, not as text (as `admission_date` holds them today). The dates and time-stamps item and the `INTNX` and `INTCK` item above need real dates so that their tests can run on the sample data.
 
